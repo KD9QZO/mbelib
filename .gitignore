@@ -1,4 +1,27 @@
+#
+# .gitignore
+#
+
+## BACKUP FILES ##
+
+*~
+*.bak
+
+
+## BUILD ARTIFACTS ##
+
 *.[ao]
 *.so*
 *.dylib
 build
+build/
+/build/
+build-*
+build-*/
+/build-*/
+
+
+## MACHINE-SPECIFIC FILES ##
+
+CMakeLists.txt.user
+**/CMakeLists.txt.user
