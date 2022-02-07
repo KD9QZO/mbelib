@@ -22,34 +22,28 @@
 #include "mbelib.h"
 #include "ambe3600x2400_const.h"
 
-void
-mbe_dumpAmbe2400Data (char *ambe_d)
-{
 
-  int i;
-  char *ambe;
 
-  ambe = ambe_d;
-  for (i = 0; i < 49; i++)
-    {
-      printf ("%i", *ambe);
-      ambe++;
-    }
-  printf (" ");
+void mbe_dumpAmbe2400Data(char *ambe_d) {
+	int i;
+	char *ambe;
+
+	ambe = ambe_d;
+	for (i = 0; i < 49; i++) {
+		printf("%i", *ambe);
+		ambe++;
+	}
+	printf(" ");
 }
 
-void
-mbe_dumpAmbe3600x2400Frame (char ambe_fr[4][24])
-{
+void mbe_dumpAmbe3600x2400Frame(char ambe_fr[4][24]) {
+	int j;
 
-  int j;
-
-  // c0
-  printf ("ambe_fr c0: ");
-  for (j = 23; j >= 0; j--)
-    {
-      printf ("%i", ambe_fr[0][j]);
-    }
+	// c0
+	printf ("ambe_fr c0: ");
+	for (j = 23; j >= 0; j--) {
+		printf("%i", ambe_fr[0][j]);
+	}
   printf (" ");
   // c1
   printf ("ambe_fr c1: ");
@@ -162,7 +156,7 @@ mbe_decodeAmbe2400Parms (char *ambe_d, mbe_parms * cur_mp, mbe_parms * prev_mp)
 
   // copy repeat from prev_mp
   cur_mp->repeat = prev_mp->repeat;
-  
+
   // check if frame is tone or other; this matches section 7.2 on the P25 Half rate vocoder annex doc
   b0 = 0;
   b0 |= ambe_d[0]<<6;
@@ -192,7 +186,7 @@ mbe_decodeAmbe2400Parms (char *ambe_d, mbe_parms * cur_mp, mbe_parms * prev_mp)
     int t6tab[8] = {0,0,0,1,1,1,1,0};
     int t5tab[8] = {0,0,1,0,1,1,0,1};
     //              V V V V V G G G     V = verified, G = guessed (and unused by all normal tone indices)
-    b1 = 0; 
+    b1 = 0;
     b1 |= t7tab[((ambe_d[6]<<2)|(ambe_d[7]<<1)|ambe_d[8])]<<7; //t7 128
     b1 |= t6tab[((ambe_d[6]<<2)|(ambe_d[7]<<1)|ambe_d[8])]<<6; //t6 64
     b1 |= t5tab[((ambe_d[6]<<2)|(ambe_d[7]<<1)|ambe_d[8])]<<5; //t5 32
@@ -261,9 +255,9 @@ mbe_decodeAmbe2400Parms (char *ambe_d, mbe_parms * cur_mp, mbe_parms * prev_mp)
   //fprintf(stderr,"Voice Frame, Pitch = %f\n", powf(2, ((float)b0+195.626)/-46.368)*8000); // was 45.368
   //fprintf(stderr,"Voice Frame, rawPitch = %02d, Pitch = %f\n", b0, powf(2, ((-1*(float)(17661/((int)1<<12))) - (2.1336e-2 * ((float)b0+0.5))))*8000);
   //fprintf(stderr,"Voice Frame, Pitch = %f, ", powf(2, (-4.311767578125 - (2.1336e-2 * ((float)b0+0.5))))*8000);
- 
+
   // decode fundamental frequency w0 from b0 is already done
- 
+
   if (silence == 0)
     {
       // w0 from specification document
@@ -271,7 +265,7 @@ mbe_decodeAmbe2400Parms (char *ambe_d, mbe_parms * cur_mp, mbe_parms * prev_mp)
       //cur_mp->w0 = f0 * (float) 2 *M_PI;
       // w0 from patent filings
       //f0 = powf (2, ((float) b0 + (float) 195.626) / -(float) 46.368); // was 45.368
-      // w0 guess  
+      // w0 guess
       f0 = powf(2, (-4.311767578125 - (2.1336e-2 * ((float)b0+0.5))));
       cur_mp->w0 = f0 * (float) 2 *M_PI;
     }
@@ -283,7 +277,7 @@ mbe_decodeAmbe2400Parms (char *ambe_d, mbe_parms * cur_mp, mbe_parms * prev_mp)
   // decode L
   if (silence == 0)
     {
-      // L from specification document 
+      // L from specification document
       // lookup L in tabl3
       L = AmbePlusLtable[b0];
       // L formula from patent filings
@@ -714,27 +708,22 @@ mbe_processAmbe2400Dataf (float *aout_buf, int *errs, int *errs2, char *err_str,
   *err_str = 0;
 }
 
-void
-mbe_processAmbe2400Data (short *aout_buf, int *errs, int *errs2, char *err_str, char ambe_d[49], mbe_parms * cur_mp, mbe_parms * prev_mp, mbe_parms * prev_mp_enhanced, int uvquality)
-{
-  float float_buf[160];
+void mbe_processAmbe2400Data(short *aout_buf, int *errs, int *errs2, char *err_str, char ambe_d[49], mbe_parms *cur_mp, mbe_parms *prev_mp, mbe_parms *prev_mp_enhanced, int uvquality) {
+	float float_buf[160];
 
-  mbe_processAmbe2400Dataf (float_buf, errs, errs2, err_str, ambe_d, cur_mp, prev_mp, prev_mp_enhanced, uvquality);
-  mbe_floattoshort (float_buf, aout_buf);
+	mbe_processAmbe2400Dataf(float_buf, errs, errs2, err_str, ambe_d, cur_mp, prev_mp, prev_mp_enhanced, uvquality);
+	mbe_floattoshort(float_buf, aout_buf);
 }
 
-void
-mbe_processAmbe3600x2400Framef (float *aout_buf, int *errs, int *errs2, char *err_str, char ambe_fr[4][24], char ambe_d[49], mbe_parms * cur_mp, mbe_parms * prev_mp, mbe_parms * prev_mp_enhanced, int uvquality)
-{
+void mbe_processAmbe3600x2400Framef(float *aout_buf, int *errs, int *errs2, char *err_str, char ambe_fr[4][24], char ambe_d[49], mbe_parms * cur_mp, mbe_parms * prev_mp, mbe_parms * prev_mp_enhanced, int uvquality) {
+	*errs = 0;
+	*errs2 = 0;
+	*errs = mbe_eccAmbe3600x2400C0(ambe_fr);
+	mbe_demodulateAmbe3600x2400Data(ambe_fr);
+	*errs2 = *errs;
+	*errs2 += mbe_eccAmbe3600x2400Data(ambe_fr, ambe_d);
 
-  *errs = 0;
-  *errs2 = 0;
-  *errs = mbe_eccAmbe3600x2400C0 (ambe_fr);
-  mbe_demodulateAmbe3600x2400Data (ambe_fr);
-  *errs2 = *errs;
-  *errs2 += mbe_eccAmbe3600x2400Data (ambe_fr, ambe_d);
-
-  mbe_processAmbe2400Dataf (aout_buf, errs, errs2, err_str, ambe_d, cur_mp, prev_mp, prev_mp_enhanced, uvquality);
+	mbe_processAmbe2400Dataf(aout_buf, errs, errs2, err_str, ambe_d, cur_mp, prev_mp, prev_mp_enhanced, uvquality);
 }
 
 void

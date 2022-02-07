@@ -15,6 +15,10 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef CONFIG_H_
+#define CONFIG_H_
+
+
 /*
  * very noisy debug/developer options
  */
@@ -22,3 +26,6 @@
 //#define MBE_DEBUG
 //#define IMBE_DEBUG
 //#define AMBE_DEBUG
+
+
+#endif	/* !CONFIG_H_ */
